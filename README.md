@@ -2,6 +2,8 @@
 
 ## ダウンロード
 
+[GoogleDrive](https://drive.google.com/open?id=1WuL1QrlpedWpC8azS_P3qYsF9MxiVIgd)
+
 ## 起動
 
 ### Windows
