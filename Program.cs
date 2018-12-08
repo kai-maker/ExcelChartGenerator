@@ -143,13 +143,19 @@ namespace ChartGeneratorFor_SeitaiJyouhoKougakuZikken
                                 foreach (var i in rx)
                                 {
                                     if (i.Value == null)
+                                    {
+                                        i.Clear();
                                         break;
+                                    }
                                     xList.Add((double)i.Value);
                                 }
                                 foreach (var i in ry)
                                 {
                                     if (i.Value == null)
+                                    {
+                                        i.Clear();
                                         break;
+                                    }
                                     yList.Add((double)i.Value);
                                 }
 
@@ -203,8 +209,8 @@ namespace ChartGeneratorFor_SeitaiJyouhoKougakuZikken
                                 chart.RoundedCorners = false;
                             }
                             var dataSheet = excelPackage.Workbook.Worksheets["dataSheet"];
-                            using (ExcelRange rx = dataSheet.Cells[2, 2, dataSheet.Dimension.End.Row, 2])
-                            using (ExcelRange ry = dataSheet.Cells[2, 3, dataSheet.Dimension.End.Row, 3])
+                            using (ExcelRange rx = dataSheet.Cells[2, 2, dataSheet.Dimension.End.Row-1, 2])
+                            using (ExcelRange ry = dataSheet.Cells[2, 3, dataSheet.Dimension.End.Row-1, 3])
                             {
                                 var serie = (ExcelScatterChartSerie)chart.Series.Add(ry.FullAddress, rx.FullAddress);
                                 serie.Marker = eMarkerStyle.Circle;
