@@ -71,7 +71,6 @@ namespace ChartGeneratorFor_SeitaiJyouhoKougakuZikken
                     students.Add(new Student());
                     students.Last().studentId = f.Name.Split('_')[0];
                     students.Last().experiments = new List<Experiment>();
-                    //Console.WriteLine(students.Last().studentId);
                 }
                 var experiments = students.Last().experiments;
                 if (experiments.Count == 0 || f.Name.Split('_')[1] != experiments.Last().experimentName)
@@ -79,7 +78,6 @@ namespace ChartGeneratorFor_SeitaiJyouhoKougakuZikken
                     experiments.Add(new Experiment());
                     experiments.Last().experimentName = f.Name.Split('_')[1];
                     experiments.Last().experimentTrials = new List<ExperimentTrial>();
-                    //Console.WriteLine(experiments.Last().experimentName);
                 }
                 var experimentTrials = students.Last().experiments.Last().experimentTrials;
                 if (experimentTrials.Count == 0 || f.Name.Split('_')[2] != experimentTrials.Last().trialNumber)
@@ -87,7 +85,6 @@ namespace ChartGeneratorFor_SeitaiJyouhoKougakuZikken
                     experimentTrials.Add(new ExperimentTrial());
                     experimentTrials.Last().trialNumber = f.Name.Split('_')[2].Split('.')[0];
                     experimentTrials.Last().inputCSVFile = f;
-                    //Console.WriteLine(experimentTrials.Last().trialNumber);
                 }
             }
 
@@ -271,9 +268,8 @@ namespace ChartGeneratorFor_SeitaiJyouhoKougakuZikken
                         ExcelWorksheet fourierSheet = trial.excelPackage.Workbook.Worksheets.Add("fourierSheet");
                         ExcelWorksheet dataSheet = trial.excelPackage.Workbook.Worksheets["dataSheet"];
                         {
-                            Complex[] complexData = new Complex[4096];
-                            var xList = new List<Complex>();
-                            var yList = new List<Complex>();
+                            var xArray = new Complex[4096];
+                            var yArray = new Complex[4096];
                             using (ExcelRange rx = dataSheet.Cells[2, 2, dataSheet.Dimension.End.Row, 2])
                             using (ExcelRange ry = dataSheet.Cells[2, 3, dataSheet.Dimension.End.Row, 3])
                             {
@@ -282,22 +278,26 @@ namespace ChartGeneratorFor_SeitaiJyouhoKougakuZikken
                                 {
                                     if (i.Value == null || count == 4096)
                                         break;
-                                    xList.Add((double)i.Value);
+                                    xArray[count] = new Complex((double)i.Value,0);
+                                    count++;
                                 }
+                                Fourier.Forward(xArray, FourierOptions.Matlab);
+                                count = 0;
                                 foreach (var i in ry)
                                 {
                                     if (i.Value == null || count == 4096)
                                         break;
-                                    yList.Add((double)i.Value);
+                                    yArray[count] = new Complex((double)i.Value, 0);
+                                    count++;
                                 }
-                                Fourier.Forward(complexData, FourierOptions.Matlab); // arbitrary length
+                                Fourier.Forward(yArray, FourierOptions.Matlab); 
                             }
                             fourierSheet.Cells[1, 2].Value = "x方向振幅[mm]";
                             fourierSheet.Cells[1, 4].Value = "y方向振幅[mm]";
                             for (int i = 0; i < 4096; i++)
                             {
-                                fourierSheet.Cells[i + 2, 2].Value = Complex.Abs(xList[i]);
-                                fourierSheet.Cells[i + 2, 4].Value = Complex.Abs(yList[i]);
+                                fourierSheet.Cells[i + 2, 2].Value = Complex.Abs(xArray[i]);
+                                fourierSheet.Cells[i + 2, 4].Value = Complex.Abs(yArray[i]);
                             }
                             double samplingFreqency = (double)90 / (double)(dataSheet.Dimension.End.Row - 1);
                             double frequency = (double)1 / (4096 * samplingFreqency);
